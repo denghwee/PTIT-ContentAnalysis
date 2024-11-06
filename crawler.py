@@ -4,12 +4,12 @@ from selenium.webdriver.chrome.options import Options
 import time
 import pandas as pd
 
-from tool import read_csv, testLoadWebsite, loadWebsite, getComment, getPost, getReact, getNumberCommentShare, getReactExtend
+from tool import read_csv, loadWebsite, getComment, getPost, getReact, getNumberCommentShare, getReactExtend
 from login import login
 
 
 # Set up fb posts and Chrome options
-data = 'data/websites.csv'
+data = './data/websites.csv'
 websites = read_csv(data)
 
 chromeOptions = Options()
@@ -42,8 +42,6 @@ df = pd.DataFrame({
 })
 
 for website in websites:
-    testLoadWebsite(driver, website)
-    time.sleep(5)
     loadWebsite(driver, website)
     postData = getPost(driver, website)
     commentData = getComment(driver, website)
@@ -60,6 +58,6 @@ for website in websites:
         'share_num': CmtShareData[1]
     })
     df = pd.concat([df, newRow], ignore_index=True)
-    df.to_csv('data/demo2.csv')
+    df.to_csv('./data/new_output.csv')
 
 driver.quit()
