@@ -19,6 +19,12 @@ def read_csv(file):
     return websites
 
 
+def testLoadWebsite(driver, website):
+    driver.get(website)
+
+    time.sleep(5)
+
+
 def loadWebsite(driver, website):
     driver.get(website)
 
@@ -31,6 +37,7 @@ def loadWebsite(driver, website):
 
     loopCount = 0
     while True:
+        # Change to all comments option
         try:
             sortingButton = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div/div/div/div/div/div/div/div/div/div/div/div/div/div[13]/div/div/div[4]/div/div/div[2]/div[2]/div/div/span/div')
             sortingButton.click()
@@ -43,7 +50,8 @@ def loadWebsite(driver, website):
             print('All Comments Error')
 
         time.sleep(5)
-    
+
+        # Extend all comments
         try:
             replies = driver.find_elements(By.XPATH, '//span[@class="x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1lliihq x1s928wv xhkezso x1gmr53x x1cpjm7i x1fgarty x1943h6x xudqn12 x3x7a5m x6prxxf xvq8zen x1s688f xi81zsa" and @dir="auto"]')
             # print("Element found:", expandComments)
@@ -146,15 +154,6 @@ def getReact(driver, website):
     return reactCount
 
 def getReactExtend(driver, website):
-    reactExtendCount = {
-        'like': [],
-        'love': [],
-        'care': [],
-        'haha': [],
-        'wow': [],
-        'sad': [],
-        'angry': [] 
-    }
 
     likeCount = "0"
     loveCount = "0"
@@ -170,7 +169,18 @@ def getReactExtend(driver, website):
     try:
         reactExtendElement = driver.find_element(
             By.XPATH, '//span[@class="xt0b8zv x1e558r4"]')
-        reactExtendElement.click()
+        
+        action = ActionChains(driver)
+        try:
+            action.move_to_element(reactExtendElement).click().perform()
+            time.sleep(1)
+        except:
+            try:
+                driver.execute_script("arguments[0].click();", reactExtendElement)
+                time.sleep(2)
+            except:
+                None
+
         print(f'Link: {website}, Reacts extend found')
     except NoSuchElementException:
         print(f'Link: {website}, Reacts extend not found')
@@ -248,17 +258,15 @@ def getReactExtend(driver, website):
     except NoSuchElementException:
         print(f'Link: {website}, No angry')
 
-    reactExtendCount_tmp = {
+    reactExtendCount = {
         'like': likeCount,
         'love': loveCount,
         'care': careCount,
         'haha': hahaCount,
         'wow': wowCount,
         'sad': sadCount,
-        'angry': angryCount 
+        'angry': angryCount
     }
-
-    reactExtendCount = pd.concat([reactExtendCount, reactExtendCount_tmp], ignore_index=True)
 
     return reactExtendCount
 
@@ -269,13 +277,13 @@ def getNumberCommentShare(driver, website):
     time.sleep(5)
 
     try:
-        reactElement = driver.find_element(
+        reactElement = driver.find_elements(
             By.XPATH, '//span[@class="html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs x1sur9pj xkrqix3"]')
+        for react in reactElement:
+            react_noAlpha = ''.join([char for char in react.text if not char.isalpha()])
+            CmtShareCount.append(react_noAlpha)
         print(f'Link: {website}, Number comments and shares found')
     except NoSuchElementException:
         print(f'Link: {website}, Number comments and shares not found')
-
-        for react in reactElement:
-            CmtShareCount.append(react.text)
 
     return CmtShareCount

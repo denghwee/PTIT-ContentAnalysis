@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 import pandas as pd
 
-from tool import read_csv, loadWebsite, getComment, getPost, getReact, getNumberCommentShare, getReactExtend
+from tool import read_csv, testLoadWebsite, loadWebsite, getComment, getPost, getReact, getNumberCommentShare, getReactExtend
 from login import login
 
 
@@ -42,6 +42,8 @@ df = pd.DataFrame({
 })
 
 for website in websites:
+    testLoadWebsite(driver, website)
+    time.sleep(5)
     loadWebsite(driver, website)
     postData = getPost(driver, website)
     commentData = getComment(driver, website)
